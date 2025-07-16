@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zLang - Decode Gen Z Slang</title>
+    <style>
+        :root {
+            --primary: #7b2ff2;
+            --secondary: #f357a8;
+            --header-gradient: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+            --glass-bg: rgba(255,255,255,0.90);
+            --border: #e0c3fc;
+            --text: #2d1b4f;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(270deg, #a18cd1, #fbc2eb, #fad0c4, #ffd6e0, #b5ead7, #a1c4fd, #c2e9fb, #fbc2eb, #a18cd1);
+            background-size: 300% 300%;
+            animation: gradientBG 12s ease-in-out infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            25% {background-position: 50% 100%;}
+            50% {background-position: 100% 50%;}
+            75% {background-position: 50% 0%;}
+            100% {background-position: 0% 50%;}
+        }
+        .header {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 0 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 2.1rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            text-transform: lowercase;
+        }
+        .logo-emoji {
+            font-size: 2.2rem;
+            animation: bounce 1.2s infinite alternate;
+        }
+        @keyframes bounce {
+            to { transform: translateY(-8px) scale(1.08); }
+        }
+        .nav {
+            font-size: 1.08rem;
+            color: var(--primary);
+            opacity: 0.7;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+            margin-right: 24px;
+        }
+        .nav:hover, .nav:focus {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        .hero {
+            background: var(--glass-bg);
+            border-radius: 32px;
+            box-shadow: 0 8px 40px 0 rgba(123,47,242,0.13);
+            border: 1.5px solid var(--border);
+            backdrop-filter: blur(10px);
+            max-width: 520px;
+            margin: 56px auto 0 auto;
+            padding: 54px 38px 44px 38px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .hero-logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        .hero-logo-emoji {
+            font-size: 3.2rem;
+            animation: bounce 1.2s infinite alternate;
+        }
+        .hero-logo-text {
+            font-size: 2.7rem;
+            font-weight: 900;
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+        }
+        .hero-title {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            margin-top: 0;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+        .hero-tagline {
+            color: #5a189a;
+            font-size: 1.18rem;
+            margin-bottom: 28px;
+            margin-top: 0;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        .go-btn {
+            padding: 20px 0;
+            width: 100%;
+            background: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.35rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 2px 16px rgba(123,47,242,0.13);
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 18px;
+            letter-spacing: 1.5px;
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            to { box-shadow: 0 0 32px 0 #f357a855; transform: scale(1.04); }
+        }
+        .go-btn:hover, .go-btn:focus {
+            background: linear-gradient(90deg, #f357a8 0%, #7b2ff2 100%);
+            transform: translateY(-2px) scale(1.06);
+        }
+        .features {
+            margin: 60px auto 0 auto;
+            max-width: 900px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+        }
+        .feature-card {
+            background: var(--glass-bg);
+            border-radius: 20px;
+            box-shadow: 0 4px 24px 0 rgba(123,47,242,0.10);
+            border: 1.2px solid var(--border);
+            backdrop-filter: blur(8px);
+            width: 240px;
+            min-width: 0;
+            padding: 32px 18px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.18s;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px) scale(1.04);
+        }
+        .feature-icon {
+            font-size: 2.3rem;
+            margin-bottom: 14px;
+        }
+        .feature-title {
+            font-weight: 800;
+            font-size: 1.13rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .feature-desc {
+            font-size: 1.01rem;
+            color: #4b3b6b;
+        }
+        .footer {
+            width: 100%;
+            max-width: 900px;
+            margin: 64px auto 0 auto;
+            padding: 22px 0 16px 0;
+            text-align: center;
+            color: #6c63ff;
+            font-size: 1.08rem;
+            opacity: 0.88;
+            letter-spacing: 0.2px;
+        }
+        .footer-quote {
+            font-size: 1.05rem;
+            color: #b185db;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        @media (max-width: 1100px) {
+            .features {
+                flex-direction: column;
+                align-items: center;
+                gap: 24px;
+            }
+            .feature-card {
+                width: 90vw;
+                max-width: 340px;
+            }
+        }
+        @media (max-width: 700px) {
+            .header {
+                padding: 18px 0 0 0;
+            }
+            .hero {
+                padding: 22px 4vw 22px 4vw;
+                max-width: 98vw;
+            }
+            .hero-logo-text {
+                font-size: 2rem;
+            }
+            .features {
+                margin-top: 36px;
+            }
+        }
+        @media (max-width: 500px) {
+            .hero-logo-text {
+                font-size: 1.3rem;
+            }
+            .hero-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"><span class="logo-emoji">🦄</span>zLang</div>
+        <a class="nav" href="#hero">Home</a>
+    </div>
+    <section class="hero" id="hero">
+        <div class="hero-logo">
+            <span class="hero-logo-emoji" aria-hidden="true">💬</span>
+            <span class="hero-logo-text">zLang</span>
+        </div>
+        <div class="hero-title">Decode Gen Z Slang Instantly</div>
+        <p class="hero-tagline">
+            The ultimate tool to understand, explain, and vibe with Gen Z language.<br>
+            Never get left on read again.
+        </p>
+        <button class="go-btn" onclick="window.location.href='index.html'" aria-label="Go to zLang App">Start Detecting 🚀</button>
+    </section>
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-title">Real-Time Detection</div>
+            <div class="feature-desc">Type or paste any text and instantly spot Gen Z slang words.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <div class="feature-title">Clear Explanations</div>
+            <div class="feature-desc">Get simple, fun definitions for every detected slang term.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🌗</div>
+            <div class="feature-title">Modern Design</div>
+            <div class="feature-desc">Enjoy a stylish, animated, and mobile-friendly experience with dark mode.</div>
+        </div>
+    </section>
+    <footer class="footer">
+        &copy; 2024 zLang. All rights reserved.<br>
+        <span class="footer-quote">“If you know, you know. zLang keeps you in the loop. No cap.”</span>
+    </footer>
+</body>
+</html>

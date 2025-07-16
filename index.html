@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gen Z Slang Detector</title>
+    <style>
+        :root {
+            --primary: #7b2ff2;
+            --secondary: #f357a8;
+            --header-gradient: linear-gradient(90deg, #7b2ff2 0%, #f357a8 100%);
+            --glass-bg: rgba(255,255,255,0.85);
+            --glass-bg-dark: rgba(34,34,40,0.85);
+            --border: #e0c3fc;
+            --border-dark: #3a2c5a;
+            --text: #2d1b4f;
+            --text-dark: #f3e8ff;
+            --input-bg: #f7f3ff;
+            --input-bg-dark: #2a223a;
+            --slang-bg: #f3e8ff;
+            --slang-bg-dark: #3a2c5a;
+            --highlight: #ffe066;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.4s;
+            /* Animated gradient background */
+            background: linear-gradient(270deg, #a18cd1, #fbc2eb, #fad0c4, #ffd6e0, #b5ead7, #a1c4fd, #c2e9fb, #fbc2eb, #a18cd1);
+            background-size: 300% 300%;
+            animation: gradientBG 12s ease-in-out infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            25% {background-position: 50% 100%;}
+            50% {background-position: 100% 50%;}
+            75% {background-position: 50% 0%;}
+            100% {background-position: 0% 50%;}
+        }
+        body.dark {
+            background: linear-gradient(270deg, #232946, #5f4b8b, #232946, #232946);
+            background-size: 200% 200%;
+            animation: gradientBGDark 14s ease-in-out infinite;
+        }
+        @keyframes gradientBGDark {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .container {
+            background: var(--glass-bg);
+            margin-top: 0;
+            padding: 32px 18px 22px 18px;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px 0 rgba(123,47,242,0.13);
+            width: 100%;
+            max-width: 340px;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1.5px solid var(--border);
+            backdrop-filter: blur(8px);
+            transition: background 0.4s, border 0.4s, max-width 0.3s;
+            position: relative;
+        }
+        body.dark .container {
+            background: var(--glass-bg-dark);
+            border: 1.5px solid var(--border-dark);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        .header-emoji {
+            font-size: 2.1rem;
+            animation: bounce 1.2s infinite alternate;
+        }
+        @keyframes bounce {
+            to { transform: translateY(-8px) scale(1.08); }
+        }
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            letter-spacing: 1px;
+            transition: color 0.4s;
+        }
+        .dark .header-title {
+            filter: brightness(1.2);
+        }
+        .dark-toggle {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: var(--glass-bg);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(123,47,242,0.08);
+            transition: background 0.4s;
+            z-index: 2;
+        }
+        body.dark .dark-toggle {
+            background: var(--glass-bg-dark);
+        }
+        .form-group {
+            width: 100%;
+            position: relative;
+            margin-bottom: 14px;
+        }
+        .floating-label {
+            position: absolute;
+            left: 14px;
+            top: 14px;
+            color: #a18cd1;
+            font-size: 1.01rem;
+            pointer-events: none;
+            background: transparent;
+            transition: 0.2s;
+            z-index: 2;
+        }
+        textarea {
+            width: 100%;
+            padding: 20px 12px 10px 12px;
+            border: 1.5px solid #b185db;
+            border-radius: 9px;
+            font-size: 1.01rem;
+            resize: none;
+            background: var(--input-bg);
+            color: var(--text);
+            transition: border 0.2s, background 0.4s, color 0.4s;
+            min-height: 60px;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            border: 1.5px solid var(--primary);
+            outline: none;
+            background: #f3e8ff;
+        }
+        body.dark textarea {
+            background: var(--input-bg-dark);
+            color: var(--text-dark);
+            border: 1.5px solid var(--border-dark);
+        }
+        .form-group.filled .floating-label,
+        textarea:focus + .floating-label {
+            top: 2px;
+            left: 10px;
+            font-size: 0.88rem;
+            color: var(--primary);
+            background: transparent;
+        }
+        .highlighted-input {
+            position: absolute;
+            left: 0; top: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+            padding: 20px 12px 10px 12px;
+            font-size: 1.01rem;
+            white-space: pre-wrap;
+            color: transparent;
+            background: none;
+            border-radius: 9px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .highlighted-input mark {
+            background: var(--highlight);
+            color: #2d1b4f;
+            border-radius: 4px;
+            padding: 0 2px;
+        }
+        .result {
+            margin-top: 12px;
+            width: 100%;
+            min-height: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .slang-item {
+            background: var(--slang-bg);
+            border-left: 5px solid var(--primary);
+            padding: 10px 12px 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 1px 8px rgba(123,47,242,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeInUp 0.7s;
+            position: relative;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slang-term {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.01rem;
+        }
+        .slang-meaning {
+            margin-left: 8px;
+            color: #5a189a;
+            font-size: 0.97rem;
+        }
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1.05rem;
+            cursor: pointer;
+            margin-left: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover, .copy-btn:focus {
+            background: #ffe066;
+            color: #2d1b4f;
+        }
+        .copied {
+            color: #5a189a;
+            font-size: 0.92rem;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+        body.dark .slang-item {
+            background: var(--slang-bg-dark);
+            border-left: 5px solid var(--secondary);
+        }
+        body.dark .slang-term {
+            color: var(--secondary);
+        }
+        body.dark .slang-meaning {
+            color: #ffe066;
+        }
+        body.dark .copy-btn {
+            color: #ffe066;
+        }
+        body.dark .copy-btn:hover, body.dark .copy-btn:focus {
+            background: #232946;
+            color: #f357a8;
+        }
+        body.dark .copied {
+            color: #ffe066;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 12px 2vw 12px 2vw;
+                margin-top: 0;
+                max-width: 98vw;
+            }
+            .header-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-toggle" id="darkToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+    <div class="container">
+        <div class="header">
+            <span class="header-emoji" aria-hidden="true">🦄</span>
+            <span class="header-title">Gen Z Slang Detector</span>
+        </div>
+        <form class="form-group" id="formGroup" autocomplete="off" onsubmit="return false;">
+            <div style="position:relative; width:100%;">
+                <div class="highlighted-input" id="highlightedInput" aria-hidden="true"></div>
+                <textarea id="userInput" rows="3" aria-label="Type a sentence or word" oninput="handleInput()" spellcheck="false"></textarea>
+                <label for="userInput" class="floating-label" id="floatingLabel">Type a sentence or word...</label>
+            </div>
+        </form>
+        <div class="result" id="result" aria-live="polite"></div>
+    </div>
+    <script>
+        // Gen Z slang dictionary
+        const slangDictionary = {
+            "sus": "Suspicious or suspect.",
+    "no cap": "No lie, for real.",
+    "bet": "Okay, sure, or watch.",
+    "slay": "Doing really well or looking great.",
+    "vibe check": "Assessing someone's mood or energy.",
+    "yeet": "To throw something with force.",
+    "salty": "Bitter or upset.",
+    "flex": "To show off.",
+    "bussin": "Really good, especially food.",
+    "ghost": "To ignore someone suddenly.",
+    "rizz": "Charisma, especially in dating.",
+    "mid": "Mediocre or average.",
+    "drip": "Cool or stylish outfit.",
+    "periodt": "Added for emphasis at the end of a statement.",
+    "extra": "Over the top or dramatic.",
+    "glow up": "A makeover or transformation.",
+    "simp": "Someone who does too much for someone they like.",
+    "thirsty": "Desperate for attention or validation.",
+    "stan": "Extreme fan or supporter.",
+    "clap back": "A witty or savage reply.",
+    "mood": "Something relatable.",
+    "big yikes": "Something very embarrassing.",
+    "deadass": "Seriously or genuinely.",
+    "cheugy": "Trying too hard or outdated.",
+    "main character": "Someone acting like the center of attention.",
+    "fomo": "Fear of missing out.",
+    "jomo": "Joy of missing out.",
+    "bruh": "Expression of disbelief or disappointment.",
+    "no \ud83e\udde2": "No lie, for real.",
+    "touch grass": "Get off the internet and reconnect with real life.",
+    "based": "Being true to yourself despite what others think.",
+    "w": "Win or something good.",
+    "l": "Loss or something bad.",
+    "v": "Short for 'very'.",
+    "core": "Aesthetic style (e.g., cottagecore).",
+    "goat": "Greatest of All Time.",
+    "pushin p": "Keeping it real or respectful.",
+    "ate and left no crumbs": "Did something flawlessly.",
+    "skrrt": "Sound of tires screeching or leaving quickly.",
+    "iykyk": "If you know, you know.",
+    "say less": "Understood without explanation.",
+    "bop": "A good song.",
+    "snack": "An attractive person.",
+    "lit": "Exciting or excellent.",
+    "tea": "Gossip or the latest news.",
+    "spill the tea": "Share the gossip.",
+    "shade": "Subtle insult or criticism.",
+    "savage": "Bold or brutally honest.",
+    "lowkey": "Secretly or mildly.",
+    "highkey": "Openly or intensely.",
+    "woke": "Socially aware.",
+    "cancelled": "Boycotted or no longer supported.",
+    "receipts": "Proof or evidence, usually in drama.",
+    "vibe": "The feeling or mood of something.",
+    "fire": "Amazing or excellent.",
+    "on fleek": "Perfectly executed.",
+    "thicc": "Attractively curvy or full-figured.",
+    "boo": "Significant other.",
+    "fam": "Close friends or family.",
+    "AF": "As f***, used for emphasis.",
+    "ship": "Wanting people to be in a relationship.",
+    "OTP": "One true pairing.",
+    "glitch": "Minor mistake or issue.",
+    "brain rot": "Content that\u2019s addictive but dumb.",
+    "main character energy": "Exuding confidence and self-focus.",
+    "delulu": "Being delusional in a funny or extreme way.",
+    "get that bread": "Make money or succeed.",
+    "ok boomer": "Dismissive phrase toward older generation views.",
+    "vibe shift": "A major cultural change or change in group energy.",
+    "corecore": "An aesthetic made of other aesthetics.",
+    "anti-haul": "Things you don\u2019t recommend buying.",
+    "brain dump": "Putting all thoughts down without filter.",
+    "ratio": "More replies than likes, seen as negative feedback.",
+    "dry texting": "Boring or non-engaging texts.",
+    "hits different": "Feels emotionally stronger or unique.",
+    "heather": "Someone who's effortlessly perfect.",
+    "Karen": "Entitled or demanding white woman.",
+    "Chad": "Confident, attractive man, sometimes negatively.",
+    "sigma": "Stoic and self-reliant, often used satirically.",
+    "NPC": "Someone seen as generic or unoriginal.",
+    "canon event": "A necessary part of your life story.",
+    "pick me": "Someone desperate for approval, often from the opposite sex.",
+    "girlboss": "A woman confidently in control, sometimes ironically.",
+    "gaslight": "Manipulate someone into doubting themselves.",
+    "gatekeep": "Withholding information to maintain exclusivity.",
+    "trauma dump": "Oversharing emotional experiences abruptly.",
+    "bombastic side eye": "Dramatic judgmental look.",
+    "be so for real": "Stop playing or be serious.",
+    "ate": "Did something exceptionally well.",
+    "go off": "Encouraging someone\u2019s rant or praise.",
+    "it\u2019s giving": "Describes the vibe something gives off.",
+    "dragged": "Criticized harshly online.",
+    "internet sleuth": "Someone who finds info online like a detective.",
+    "baddie": "A confident and attractive woman.",
+    "iconic": "Highly memorable or significant.",
+    "manifest": "Visualize something into reality.",
+    "vaxxed and waxed": "Vaccinated and ready for a hot girl summer.",
+    "caught in 4k": "Caught red-handed or exposed.",
+    "sus sus": "Even more suspicious.",
+    "hot take": "A controversial or unexpected opinion.",
+    "green flags": "Positive traits in someone.",
+    "red flags": "Warning signs in a person or situation.",
+    "cancel culture": "Trend of calling out and boycotting.",
+    "sksksksk": "Laughter or awkward reaction.",
+    "oop": "Used when surprised or caught off-guard.",
+    "stan Twitter": "Community of intense fans online.",
+    "chaotic good": "Unpredictable but with good intentions.",
+    "chaotic neutral": "Unpredictable and indifferent.",
+    "chaotic evil": "Unpredictable and destructive.",
+    "glitchcore": "A chaotic, digital aesthetic.",
+    "out of pocket": "Wild, inappropriate, or shocking.",
+    "mewing": "Tongue posture technique for jawline.",
+            "sus": "Suspicious or suspect.",
+            "no cap": "No lie, for real.",
+            "bet": "Okay, sure, or watch.",
+            "slay": "Doing really well or looking great.",
+            "vibe check": "Assessing someone's mood or energy.",
+            "yeet": "To throw something with force.",
+            "salty": "Bitter or upset.",
+            "flex": "To show off.",
+            "ghost": "To ignore someone suddenly.",
+            "simp": "Someone who does too much for someone they like.",
+            "drip": "Impressive style or fashion.",
+            "lit": "Exciting or excellent.",
+            "fam": "Close friend or family.",
+            "stan": "To strongly support or be a fan of someone or something.",
+            "tea": "Gossip or interesting news."
+        };
+
+        // Dark mode toggle
+        const darkToggle = document.getElementById('darkToggle');
+        darkToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('zlang-dark', document.body.classList.contains('dark'));
+            darkToggle.innerText = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        });
+        // Persist dark mode
+        if (localStorage.getItem('zlang-dark') === 'true') {
+            document.body.classList.add('dark');
+            darkToggle.innerText = '☀️';
+        }
+
+        // Floating label logic
+        const userInput = document.getElementById('userInput');
+        const floatingLabel = document.getElementById('floatingLabel');
+        const formGroup = document.getElementById('formGroup');
+        userInput.addEventListener('focus', () => formGroup.classList.add('filled'));
+        userInput.addEventListener('blur', () => {
+            if (!userInput.value) formGroup.classList.remove('filled');
+        });
+        if (userInput.value) formGroup.classList.add('filled');
+
+        // Highlight slang in input
+        const highlightedInput = document.getElementById('highlightedInput');
+        function highlightSlang(text) {
+            let result = text;
+            for (const slang in slangDictionary) {
+                // Whole word match, case-insensitive
+                const regex = new RegExp(`(\\b${slang.replace(/([.*+?^=!:${}()|[\]\\])/g, "\\$1")}\\b)`, 'gi');
+                result = result.replace(regex, '<mark>$1</mark>');
+            }
+            // For empty lines, keep height
+            return result.replace(/\n/g, '<br>') || '<br>';
+        }
+
+        // Live detection and highlighting
+        function handleInput() {
+            const text = userInput.value;
+            highlightedInput.innerHTML = highlightSlang(text);
+            detectSlang(text);
+        }
+        // Sync scroll between textarea and highlight
+        userInput.addEventListener('scroll', () => {
+            highlightedInput.scrollTop = userInput.scrollTop;
+        });
+
+        // Initial highlight
+        highlightedInput.innerHTML = '<br>';
+
+        // Slang detection and result rendering
+        function detectSlang(text) {
+            const resultDiv = document.getElementById('result');
+            let found = [];
+            const lowerText = text.toLowerCase();
+            for (const slang in slangDictionary) {
+                const regex = new RegExp(`\\b${slang.replace(/([.*+?^=!:${}()|[\]\\])/g, "\\$1")}\\b`, 'i');
+                if (regex.test(lowerText)) {
+                    found.push({
+                        slang,
+                        meaning: slangDictionary[slang]
+                    });
+                }
+            }
+            if (found.length === 0) {
+                resultDiv.innerHTML = '<em style="color:#b185db">No Gen Z slang detected.</em>';
+            } else {
+                resultDiv.innerHTML = found.map((item, idx) =>
+                    `<div class="slang-item" style="animation-delay:${idx*0.08}s">
+                        <span><span class="slang-term">${item.slang}</span>: <span class="slang-meaning">${item.meaning}</span></span>
+                        <button class="copy-btn" aria-label="Copy meaning for ${item.slang}" onclick="copyMeaning('${item.meaning.replace(/'/g, "&#39;")}', '${item.slang}', this)">📋</button>
+                        <span class="copied" style="display:none;">Copied!</span>
+                    </div>`
+                ).join('');
+            }
+        }
+
+        // Copy to clipboard logic
+        window.copyMeaning = function(meaning, slang, btn) {
+            navigator.clipboard.writeText(meaning).then(() => {
+                const copied = btn.nextElementSibling;
+                copied.style.display = 'inline';
+                setTimeout(() => { copied.style.display = 'none'; }, 1200);
+            });
+        }
+
+        // Initial detection
+        detectSlang(userInput.value);
+    </script>
+</body>
+</html>
